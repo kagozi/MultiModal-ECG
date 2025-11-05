@@ -6,20 +6,27 @@ flowchart LR
     CWT["CWT<br>(Morlet wavelet)"]
 
     %% --- Branch to Scalogram & Phasogram ---
-    SCL["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/scalogram.png' width='70px' ><br>Scalograms<br>(224 × 224 × 12)"]
+    SCL["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources//scalogram.png' width='70px' ><br>Scalograms<br>(224 × 224 × 12)"]
     PHS["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/phasogram.png' width='70px' ><br>Phasograms<br>(224 × 224 × 12)"]
 
-    %% --- Early Fusion: Channel Concat ---
-    SCL --> EC["Early Concat<br>[SCL; PHS] ∈ ℝ^(B×24×224×224)"]
-    PHS --> EC
+    %% --- Flow ---
+    R --> CWT
+    CWT --> SCL
+    CWT --> PHS
 
-    %% --- Adapter (24 → 3 ch) ---
-    EC --> A["Adapter 1×1 Conv<br>24 → 3 ch"]
+    %% --- Choose ONE branch (user picks) ---
+    subgraph Input_Choice ["Input Stream (choose one)"]
+        direction TB
+        SCL
+        PHS
+    end
 
-    %% --- Pretrained Backbone ---
-    A --> PT["Pretrained Backbone<br>(e.g., EfficientNet)<br>→ f ∈ ℝ^(B×d)"]
+    %% --- OR (user selection) ---
+    SCL --> OR["OR"]
+    PHS --> OR
 
-    %% --- Classifier ---
+    %% --- Model (unchanged) ---
+    OR --> PT["2D CNN<br>(224, 224, 12)<br>→ f ∈ ℝ^(B×d)"]
     PT --> CLS["Classifier<br>d → 512 → 5<br>ReLU → BN → Drop"]
 
     %% --- Output ---
@@ -37,11 +44,10 @@ flowchart LR
     %% --- Styling ---
     classDef img fill:#ffffff,stroke:#cccccc,stroke-width:1px
     classDef mod fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
-    classDef join fill:#ede7f6,stroke:#5e35b1,stroke-width:1px
     classDef head fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
     classDef neuron fill:#c8e6c9,stroke:#2e7d32,stroke-width:1px
 
-    class R,SCL,PHS img
-    class EC,A,PT mod
+    class R,SCL,PHS,CWT img
+    class PT,OR mod
     class CLS,SIG head
     class O1,O2,O3,O4,O5 neuron

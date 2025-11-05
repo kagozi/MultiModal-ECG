@@ -1,26 +1,31 @@
+%%{init: {"securityLevel":"loose","flowchart":{"htmlLabels":true}} }%%
 flowchart LR
-    %% --- Inputs ---
-    R["<img src='https://raw.githubusercontent.com/kagozi/ECG-Greedy/main/rawsignal.png' width='70px' ><br>Raw ECGs<br>(12 × 1000)"]
-    SCL["<img src='https://raw.githubusercontent.com/kagozi/ECG-Greedy/main/scalogram.png' width='70px' ><br>Scalograms<br>(224 × 224 × 12)"]
-    PHS["<img src='https://raw.githubusercontent.com/kagozi/ECG-Greedy/main/phasogram.png' width='70px' ><br>Phasograms<br>(224 × 224 × 12)"]
+    %% --- Raw input ---
+    R["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/rawsignal.png' width='70px' ><br><b>Raw ECGs</b><br>(12 × 1000)"]
 
-    %% --- Transform Arrows (optional, dotted for generation) ---
-    R -.->|CWT| SCL
-    R -.->|Phase| PHS
+    %% --- CWT (single block) ---
+    CWT["CWT<br>(Morlet wavelet)"]
 
-    %% --- Dual Stream CNNs ---
-    SCL --> E1["Dual Stream CNN → fₛ ∈ ℝ^(B×d)"]
-    PHS --> E2["Dual Stream CNN → fₚ ∈ ℝ^(B×d)"]
+    %% --- Branch to Scalogram & Phasogram ---
+    SCL["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/scalogram.png' width='70px' ><br><b>Scalograms</b><br>(224 × 224 × 12)"]
+    PHS["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/phasogram.png' width='70px' ><br><b>Phasograms</b><br>(224 × 224 × 12)"]
 
-    %% --- Late Fusion ---
-    E1 --> C["Concat [fₛ; fₚ] ∈ ℝ^(B×2d)"]
-    E2 --> C
+    %% --- Flow ---
+    R --> CWT
+    CWT --> SCL
+    CWT --> PHS
 
-    %% --- Fusion + Classifier ---
-    C --> FUS["Fusion MLP<br>2d → 1024 → ReLU → BN → Drop"]
-    FUS --> CLS["Classifier<br>1024 → 512 → 5<br>ReLU → BN → Drop"]
+    %% --- Early Fusion: Concatenate ---
+    SCL --> EC["Early Concat<br>[SCL; PHS] ∈ ℝ^(B×24×224×224)"]
+    PHS --> EC
 
-    %% --- Output Layer ---
+    %% --- CWT2DCNN (native 24-ch) ---
+    EC --> CNN["CWT2DCNN<br>(24-channel input)<br>→ 1024-d (avg+max pool)"]
+
+    %% --- Classifier (match models.py) ---
+    CNN --> CLS["Classifier<br>1024 → 256 → 5<br>ReLU → Drop(0.3)"]
+
+    %% --- Output ---
     subgraph Output ["Final Multilabel Classifier"]
         direction TB
         CLS --> O1(( ))
@@ -35,12 +40,10 @@ flowchart LR
     %% --- Styling ---
     classDef img fill:#ffffff,stroke:#cccccc,stroke-width:1px
     classDef mod fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
-    classDef join fill: #ede7f6,stroke:#5e35b1,stroke-width:1px
     classDef head fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
     classDef neuron fill:#c8e6c9,stroke:#2e7d32,stroke-width:1px
 
-    class R,SCL,PHS img
-    class E1,E2 mod
-    class C join
-    class FUS,CLS,SIG head
+    class R,SCL,PHS,CWT img
+    class EC,CNN mod
+    class CLS,SIG head
     class O1,O2,O3,O4,O5 neuron
