@@ -24,18 +24,14 @@ from models import (CWT2DCNN, DualStreamCNN, ViTFusionECG,
                     ResNet50LateFusion,
                     ResNet50ECG
 )
+from configs import WAVELETS_PATH, RESULTS_PATH, PROCESSED_PATH, BASELINE_RESULTS_PATH, DATA_PATH
 from benchmark import XResNet1d101, load_ptbxl_dataset, aggregate_diagnostic_labels, preprocess_signals, prepare_labels
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
-PROCESSED_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/'
-# WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/'
-WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets_ptbxl_scarpiniti/'
-RESULTS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/results/'
-BASELINE_RESULTS_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/results/'
-DATA_PATH = '../datasets/ECG/'
+
 ENSEMBLE_PATH = os.path.join(RESULTS_PATH, 'ensemble_results/')
 BATCH_SIZE = 8
 NUM_WORKERS = 4

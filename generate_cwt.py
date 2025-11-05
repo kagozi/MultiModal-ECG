@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-STEP 2: Generate CWT Scalograms & Phasograms for PTB-XL (Scarpiniti et al. 2024 Style)
+STEP 2: Generate CWT Scalograms & Phasograms for PTB-XL
 
 Features:
 - 12-lead ECG (PTB-XL)
@@ -28,8 +28,7 @@ from numpy.lib.format import open_memmap
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
-PROCESSED_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/'
-WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets_ptbxl_scarpiniti/'
+from configs import WAVELETS_PATH, PROCESSED_PATH
 
 SAMPLING_RATE = 100        # PTB-XL native rate
 IMAGE_SIZE = 224
