@@ -33,8 +33,8 @@ from configs import configs
 # ============================================================================
 
 PROCESSED_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/'
-WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/'
-RESULTS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/results/'
+WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets_ptbxl_scarpiniti/'
+RESULTS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/pprocessed_wavelets_ptbxl_scarpiniti/results/'
 BATCH_SIZE = 8
 EPOCHS = 30
 LR = 0.001
@@ -51,35 +51,46 @@ os.makedirs(RESULTS_PATH, exist_ok=True)
 # ============================================================================
 class CWTDataset(Dataset):
     """
-    Memory-efficient dataset that loads CWT data on-the-fly
-    Uses memory mapping to avoid loading entire dataset into RAM
+    Memory-efficient dataset for uint8 CWT scalograms/phasograms
+    - Uses mmap → no full load
+    - Converts uint8 → float32 only at last step (on GPU)
+    - Optional fusion: 12+12 → 24 channels
     """
     
-    def __init__(self, scalo_path, phaso_path, labels, mode='scalogram'):
+    def __init__(self, scalo_path, phaso_path, labels, mode='fusion'):
         """
         Args:
-            scalo_path: Path to scalogram .npy file
-            phaso_path: Path to phasogram .npy file
-            labels: (N, num_classes) numpy array
-            mode: 'scalogram', 'phasogram', 'both', or 'fusion'
+            scalo_path: str, path to *_scalograms.npy (uint8)
+            phaso_path: str, path to *_phasograms.npy (uint8)
+            labels: (N, num_classes) np.array or torch.Tensor
+            mode: 'scalogram' | 'phasogram' | 'both' | 'fusion'
         """
-        self.scalograms = np.load(scalo_path, mmap_mode='r')
-        self.phasograms = np.load(phaso_path, mmap_mode='r')
-        self.labels = torch.FloatTensor(labels)
+        # Memory-map uint8 files
+        self.scalograms = np.load(scalo_path, mmap_mode='r')   # (N,12,224,224) uint8
+        self.phasograms = np.load(phaso_path, mmap_mode='r')   # (N,12,224,224) uint8
+        
+        # Labels: convert to tensor once
+        self.labels = torch.FloatTensor(labels) if isinstance(labels, np.ndarray) else labels
+        
         self.mode = mode
         
-        print(f"  Dataset loaded: {len(self.labels)} samples, mode={mode}")
-        print(f"  Scalograms shape: {self.scalograms.shape}")
-        print(f"  Phasograms shape: {self.phasograms.shape}")
+        print(f"  CWT Dataset loaded: {len(self)} samples")
+        print(f"    Scalograms: {self.scalograms.shape} [{self.scalograms.dtype}]")
+        print(f"    Phasograms: {self.phasograms.shape} [{self.phasograms.dtype}]")
+        print(f"    Mode: {mode}")
     
     def __len__(self):
         return len(self.labels)
     
     def __getitem__(self, idx):
-        # Load data on-the-fly from memory-mapped files
-        # Copy arrays to make them writable before converting to tensor
-        scalo = torch.FloatTensor(np.array(self.scalograms[idx], copy=True))
-        phaso = torch.FloatTensor(np.array(self.phasograms[idx], copy=True))
+        # Get uint8 slices (no copy!)
+        scalo_uint8 = self.scalograms[idx]   # (12,224,224) uint8
+        phaso_uint8 = self.phasograms[idx]   # (12,224,224) uint8
+        
+        # Convert to torch + normalize to [0,1] in one step
+        scalo = torch.from_numpy(scalo_uint8).float() / 255.0   # (12,224,224)
+        phaso = torch.from_numpy(phaso_uint8).float() / 255.0   # (12,224,224)
+        
         label = self.labels[idx]
         
         if self.mode == 'scalogram':
@@ -89,8 +100,7 @@ class CWTDataset(Dataset):
         elif self.mode == 'both':
             return (scalo, phaso), label
         elif self.mode == 'fusion':
-            # Concatenate along channel dimension: (12, H, W) + (12, H, W) = (24, H, W)
-            fused = torch.cat([scalo, phaso], dim=0)
+            fused = torch.cat([scalo, phaso], dim=0)  # (24,224,224)
             return fused, label
         else:
             raise ValueError(f"Unknown mode: {self.mode}")

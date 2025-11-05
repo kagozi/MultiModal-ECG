@@ -127,7 +127,7 @@ class CWTGenerator:
             Wm = self.resize(Wm)
             Wm = self.to_uint8(Wm)
 
-            # Phasogram: phase (no unwrap – matches paper)
+            # Phasogram: phase
             Wp = np.angle(coeffs)
             Wp = self.resize(Wp)
             Wp = self.to_uint8(Wp)
@@ -212,15 +212,14 @@ def main():
         del X
 
     print("\n" + "="*80)
-    print("STEP 2 COMPLETE! (PTB-XL + Scarpiniti Pipeline)")
+    print("STEP 2 COMPLETE! (PTB-XL CWT GENERATION)")
     print("="*80)
     print(f"All files saved to: {WAVELETS_PATH}")
     print("\nFiles created:")
     for split in splits:
         print(f"  - {split}_scalograms.npy")
         print(f"  - {split}_phasograms.npy")
-    print("\nNext step: Train XResNet with BCEWithLogitsLoss (multi-label)")
-    print("Tip: Stack scalogram + phasogram → 24-channel input or train separately")
+    print("\nNext step: Train models with BCEWithLogitsLoss (multi-label)")
     print("="*80)
 
 if __name__ == '__main__':

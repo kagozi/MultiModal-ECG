@@ -582,24 +582,6 @@ class EfficientNetLateFusion(nn.Module):
         return output
 
 
-# SE Attention Block
-class SEBlock(nn.Module):
-    def __init__(self, channels, reduction=16):
-        super(SEBlock, self).__init__()
-        self.global_avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Sequential(
-            nn.Linear(channels, channels // reduction),
-            nn.ReLU(),
-            nn.Linear(channels // reduction, channels),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        batch, channels, _, _ = x.size()
-        scale = self.global_avg_pool(x).view(batch, channels)
-        scale = self.fc(scale).view(batch, channels, 1, 1)
-        return x * scale
-
 # ============================================================================
 # SE BLOCK (needed for hybrid models)
 # ============================================================================
