@@ -37,10 +37,9 @@ configs = [
         # {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'name': 'EarlyFusion-ResNet50-Learned', 'loss': 'focal_weighted'},
         {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'name': 'EarlyFusion-ResNet50-Focal', 'loss': 'focal'},
         {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'name': 'EarlyFusion-ResNet50-BCE', 'loss': 'bce'},
-        
-        {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Learned', 'loss': 'focal_weighted'},
+        {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-BCE', 'loss': 'bce'},
         {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Focal', 'loss': 'focal'},
-        {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Focal-Weighted', 'loss': 'focal_weighted'},
+        # {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Focal-Weighted', 'loss': 'focal_weighted'},
         
         # EfficientNet ECG variants
         {'mode': 'scalogram', 'model': 'EfficientNetECG', 'name': 'Scalogram-EfficientNet-ECG-Focal', 'loss': 'focal'},
