@@ -5,46 +5,96 @@ DATA_PATH = '../datasets/ECG/'
 
 #Define model configurations to train
 configs = [
-        {'mode': 'scalogram', 'model': 'CWT2DCNN', 'name': 'Scalogram-2DCNN-BCE', 'loss': 'bce'},
-        {'mode': 'scalogram', 'model': 'CWT2DCNN', 'name': 'Scalogram-2DCNN-Focal', 'loss': 'focal'},
-        {'mode': 'fusion', 'model': 'CWT2DCNN', 'name': 'Fusion-2DCNN-BCE', 'loss': 'bce'},
-         {'mode': 'fusion', 'model': 'CWT2DCNN', 'name': 'Fusion-2DCNN-Focal', 'loss': 'focal'},
-        {'mode': 'both', 'model': 'DualStream', 'name': 'DualStream-CNN-BCE', 'loss': 'bce'},
-        {'mode': 'both', 'model': 'DualStream', 'name': 'DualStream-CNN-Focal', 'loss': 'focal'},
-              
+        
+        # {'mode': 'scalogram', 'model': 'CWT2DCNN', 'name': 'Scalogram-2DCNN-BCE', 'loss': 'bce'},
+        # {'mode': 'scalogram', 'model': 'CWT2DCNN', 'name': 'Scalogram-2DCNN-Focal', 'loss': 'focal'},
+        {'mode': 'scalogram', 'model': 'CWT2DCNN', 'name': 'Scalogram-2DCNN-Focal-Weighted', 'loss': 'focal_weighted'},
+        {'mode': 'phasogram', 'model': 'CWT2DCNN', 'name': 'Phasogram-2DCNN-BCE', 'loss': 'bce'},
+        {'mode': 'phasogram', 'model': 'CWT2DCNN', 'name': 'Phasogram-2DCNN-Focal', 'loss': 'focal'},
+        {'mode': 'phasogram', 'model': 'CWT2DCNN', 'name': 'Phasogram-2DCNN-Focal-Weighted', 'loss': 'focal_weighted'},
+        
+        # {'mode': 'fusion', 'model': 'CWT2DCNN', 'name': 'Fusion-2DCNN-BCE', 'loss': 'bce'},
+        #  {'mode': 'fusion', 'model': 'CWT2DCNN', 'name': 'Fusion-2DCNN-Focal', 'loss': 'focal'},
+        {'mode': 'fusion', 'model': 'CWT2DCNN', 'name': 'Fusion-2DCNN-Focal-Weighted', 'loss': 'focal_weighted'},
+        {'mode': 'both', 'model': 'DualStream', 'name': 'DualStream-CNN-Focal-Weighted', 'loss': 'focal_weighted'},
+        # {'mode': 'both', 'model': 'DualStream', 'name': 'DualStream-CNN-BCE', 'loss': 'bce'},
+        # {'mode': 'both', 'model': 'DualStream', 'name': 'DualStream-CNN-Focal', 'loss': 'focal'},
+             
+        # {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-Focal-Learned', 'loss': 'focal'},
+        # {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-BCE-Learned', 'loss': 'bce'},
+        # {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-BCE-Learned', 'loss': 'bce'},
+        
+        # ResNet50 variants
+        # {'mode': 'scalogram', 'model': 'ResNet50ECG', 'name': 'Scalogram-ResNet50-Learned', 'loss': 'focal_weighted'},
+         {'mode': 'scalogram', 'model': 'ResNet50ECG', 'name': 'Scalogram-ResNet50-Focal', 'loss': 'focal'},
+        {'mode': 'phasogram', 'model': 'ResNet50ECG', 'name': 'Phasogram-ResNet50-Focal', 'loss': 'focal'},
+        {'mode': 'scalogram', 'model': 'ResNet50ECG', 'name': 'Scalogram-ResNet50-BCE', 'loss': 'bce'},
+        {'mode': 'phasogram', 'model': 'ResNet50ECG', 'name': 'Phasogram-ResNet50-BCE', 'loss': 'bce'},
+        # {'mode': 'scalogram', 'model': 'ResNet50ECG', 'name': 'Scalogram-ResNet50-Focal-Weighted', 'loss': 'focal_weighted'},
+        # {'mode': 'phasogram', 'model': 'ResNet50ECG', 'name': 'Phasogram-ResNet50-Focal-Weighted', 'loss': 'focal_weighted'},
+        
+        # ResNet50 Early Fusion
+        # {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'name': 'EarlyFusion-ResNet50-Learned', 'loss': 'focal_weighted'},
+        {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'name': 'EarlyFusion-ResNet50-Focal', 'loss': 'focal'},
+        {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'name': 'EarlyFusion-ResNet50-BCE', 'loss': 'bce'},
+        
+        {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Learned', 'loss': 'focal_weighted'},
+        {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Focal', 'loss': 'focal'},
+        {'mode': 'both', 'model': 'ResNet50LateFusion', 'name': 'LateFusion-ResNet50-Focal-Weighted', 'loss': 'focal_weighted'},
+        
+        # EfficientNet ECG variants
+        {'mode': 'scalogram', 'model': 'EfficientNetECG', 'name': 'Scalogram-EfficientNet-ECG-Focal', 'loss': 'focal'},
+        {'mode': 'scalogram', 'model': 'EfficientNetECG', 'name': 'Scalogram-EfficientNet-ECG-BCE', 'loss': 'bce'},
+        {'mode': 'phasogram', 'model': 'EfficientNetECG', 'name': 'Phasogram-EfficientNet-ECG-BCE', 'loss': 'bce'},
+        {'mode': 'phasogram', 'model': 'EfficientNetECG', 'name': 'Phasogram-EfficientNet-ECG-Focal', 'loss': 'focal'},
+        {'mode': 'scalogram', 'model': 'EfficientNetECG', 'name': 'Scalogram-EfficientNet-ECG-Focal-Weighted', 'loss': 'focal_weighted'},
+        {'mode': 'phasogram', 'model': 'EfficientNetECG', 'name': 'Phasogram-EfficientNet-ECG-Focal-Weighted', 'loss': 'focal_weighted'},
 
+
+        # EfficientNet Early Fusion variants
+        {'mode': 'both', 'model': 'EfficientNetFusionECG', 'name': 'EfficientNet-ECG-Focal', 'loss': 'focal'},
+        {'mode': 'both', 'model': 'EfficientNetFusionECG', 'name': 'EfficientNet-ECG-BCE', 'loss': 'bce'},
+        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'EfficientNetLateFusion-Focal-Weighted', 'loss': 'focal_weighted'},
         
-        {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-Focal-Learned', 'loss': 'focal', 'adapter': 'learned'},
-        {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-BCE-Learned', 'loss': 'bce', 'adapter': 'learned'},
-        {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-Focal-Select', 'loss': 'focal', 'adapter': 'select'},
-        {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-Focal-Learned', 'loss': 'focal', 'adapter': 'learned'},
-        {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-BCE-Learned', 'loss': 'bce', 'adapter': 'learned'},
-        {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-Focal-Select', 'loss': 'focal', 'adapter': 'select'},
-        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'EfficientNetLateFusion-Focal-Learned', 'loss': 'focal', 'adapter': 'learned'},
-        {'mode': 'both', 'model': 'ViTLateFusion', 'name': 'ViTLateFusion-Focal-Learned', 'loss': 'focal', 'adapter': 'learned'},
+        ## EfficientNet Late Fusion variants
+        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'LateFusion-EfficientNet-Focal', 'loss': 'focal'},
+        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'LateFusion-EfficientNet-BCE', 'loss': 'bce'},
+        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'LateFusion-EfficientNet-Focal-Weighted', 'loss': 'focal_weighted'},
         
-        {'mode': 'scalogram', 'model': 'ViTECG', 'name': 'ViT-ECG-BCE-Learned', 'loss': 'bce', 'adapter': 'learned'},
-        {'mode': 'scalogram', 'model': 'EfficientNetFusionECG', 'name': 'EfficientNet-ECG-Focal-Learned', 'loss': 'focal', 'adapter': 'learned'},
+        
+        # SwinTransformerECG                 
+        {'mode': 'scalogram', 'model': 'SwinTransformerECG', 'name': 'Scalogram-SwinTransformerECG-BCE', 'loss': 'bce'},
+        {'mode': 'phasogram', 'model': 'SwinTransformerECG', 'name': 'Phasogram-SwinTransformerECG-BCE', 'loss': 'bce'},
+        
+        {'mode': 'scalogram', 'model': 'SwinTransformerECG', 'name': 'Scalogram-SwinTransformerECG-Focal', 'loss': 'focal'},
+        {'mode': 'phasogram', 'model': 'SwinTransformerECG', 'name': 'Phasogram-SwinTransformerECG-Focal', 'loss': 'focal'},
+        
+        {'mode': 'scalogram', 'model': 'SwinTransformerECG', 'name': 'Scalogram-SwinTransformerECG-Focal-Weighted', 'loss': 'focal_weighted'},
+        {'mode': 'phasogram', 'model': 'SwinTransformerECG', 'name': 'Phasogram-SwinTransformerECG-Focal-Weighted', 'loss': 'focal_weighted'},
+        
+        # SwinTransformerEarlyFusion     
+        {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-Focal-Weighted', 'loss': 'focal_weighted'},
+        # {'mode': 'fusion', 'model': 'SwinTransformerEarlyFusion', 'name': 'EarlyFusion-Swin-Focal', 'loss': 'focal'},
+        
+        # SwinTransformerLateFusion
+        {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-Focal-Weighted', 'loss': 'focal_weighted'},
+        {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-BCE', 'loss': 'bce'},
+        {'mode': 'both', 'model': 'SwinTransformerLateFusion', 'name': 'LateFusion-Swin-Focal', 'loss': 'focal'},
          
         # Hybrid Swin variants
-        {'mode': 'scalogram', 'model': 'HybridSwinTransformerECG', 'adapter': 'learned', 'name': 'Scalogram-HybridSwin-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'fusion', 'model': 'HybridSwinTransformerEarlyFusion', 'name': 'EarlyFusion-HybridSwin', 'loss': 'focal_weighted'},
+        # {'mode': 'scalogram', 'model': 'HybridSwinTransformerECG', 'name': 'Scalogram-HybridSwin-Learned', 'loss': 'focal_weighted'},
+        {'mode': 'scalogram', 'model': 'HybridSwinTransformerECG', 'name': 'Scalogram-HybridSwin-Focal', 'loss': 'focal'},
+        {'mode': 'phasogram', 'model': 'HybridSwinTransformerECG', 'name': 'Phasogram-HybridSwin-Focal', 'loss': 'focal'},
         
-
-        {'mode': 'phasogram', 'model': 'HybridSwinTransformerECG', 'adapter': 'learned', 'name': 'Scalogram-HybridSwin-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'both', 'model': 'HybridSwinTransformerLateFusion', 'adapter': 'learned', 'name': 'LateFusion-HybridSwin-Learned', 'loss': 'focal_weighted'},
+        {'mode': 'scalogram', 'model': 'HybridSwinTransformerECG', 'name': 'Scalogram-HybridSwin-BCE', 'loss': 'bce'},
+        {'mode': 'phasogram', 'model': 'HybridSwinTransformerECG', 'name': 'Phasogram-HybridSwin-BCE', 'loss': 'bce'},
         
+        {'mode': 'fusion', 'model': 'HybridSwinTransformerEarlyFusion', 'name': 'EarlyFusion-HybridSwin-Focal', 'loss': 'focal'},
+        {'mode': 'fusion', 'model': 'HybridSwinTransformerEarlyFusion', 'name': 'EarlyFusion-HybridSwin-BCE', 'loss': 'bce'},
+        # {'mode': 'fusion', 'model': 'HybridSwinTransformerEarlyFusion', 'name': 'EarlyFusion-HybridSwin', 'loss': 'focal_weighted'},
         
-        ## ResNet50 variants
-        {'mode': 'scalogram', 'model': 'ResNet50ECG', 'adapter': 'learned', 'name': 'Scalogram-ResNet50-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'fusion', 'model': 'ResNet50EarlyFusion', 'adapter': 'learned', 'name': 'EarlyFusion-ResNet50-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'both', 'model': 'ResNet50LateFusion', 'adapter': 'learned', 'name': 'LateFusion-ResNet50-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'phasogram', 'model': 'ResNet50ECG', 'adapter': 'learned', 'name': 'Phasogram-ResNet50-Learned', 'loss': 'focal_weighted'},
-        
-        ## EfficientNet variants
-        {'mode': 'scalogram', 'model': 'EfficientNetFusionECG', 'adapter': 'learned', 'name': 'Scalogram-EfficientNet-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'fusion', 'model': 'EfficientNetEarlyFusion', 'adapter': 'learned', 'name': 'EarlyFusion-EfficientNet-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'adapter': 'learned', 'name': 'LateFusion-EfficientNet-Learned', 'loss': 'focal_weighted'},
-        {'mode': 'phasogram', 'model': 'EfficientNetFusionECG', 'adapter': 'learned', 'name': 'Phasogram-EfficientNet-Learned', 'loss': 'focal_weighted'},
-
+        # {'mode': 'phasogram', 'model': 'HybridSwinTransformerECG', 'name': 'Scalogram-HybridSwin-Learned', 'loss': 'focal_weighted'},
+        {'mode': 'both', 'model': 'HybridSwinTransformerLateFusion', 'name': 'LateFusion-HybridSwin-Focal', 'loss': 'focal'},
+        {'mode': 'both', 'model': 'HybridSwinTransformerLateFusion', 'name': 'LateFusion-HybridSwin-BCE', 'loss': 'bce'},
+        # {'mode': 'both', 'model': 'HybridSwinTransformerLateFusion', 'name': 'LateFusion-HybridSwin-Learned', 'loss': 'focal_weighted'},
 ]

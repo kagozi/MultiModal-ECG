@@ -385,7 +385,52 @@ class EfficientNetFusionECG(nn.Module):
         output = self.classifier(features)
         return output
     
+
+# ============================================================================
+# EfficientNet - SINGLE MODALITY
+# ============================================================================
+
+class EfficientNetECG(nn.Module):
+    """
+    EfficientNet for ECG - robust CNN baseline.
+    Works with 12-channel inputs (scalogram OR phasogram).
+    """
     
+    def __init__(self, num_classes=5, dropout=0.3, pretrained=True, adapter_strategy='learned'):
+        super().__init__()
+        
+        # Channel adapter: 12 → 3
+        self.adapter = ChannelAdapter(strategy=adapter_strategy)
+        
+        # Load pretrained EfficientNet
+        self.backbone = timm.create_model(
+            'efficientnet_b2',
+            pretrained=pretrained,
+            num_classes=0,  # Remove classifier
+            in_chans=3
+        )
+        
+        num_features = self.backbone.num_features  # 2048 for EfficientNet
+        
+        # Custom classification head
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(num_features, 512),
+            nn.ReLU(),
+            nn.BatchNorm1d(512),
+            nn.Dropout(dropout / 2),
+            nn.Linear(512, num_classes)
+        )
+        
+        n_params = sum(p.numel() for p in self.parameters())
+        print(f"  EfficientNet: {n_params/1e6:.1f}M parameters (adapter={adapter_strategy})")
+    
+    def forward(self, x):
+        # x: (B, 12, H, W) → (B, 3, H, W)
+        x = self.adapter(x)
+        features = self.backbone(x)
+        output = self.classifier(features)
+        return output
 
 class ViTFusionECG(nn.Module):
     """Vision Transformer for ECG classification with 12-channel input"""
