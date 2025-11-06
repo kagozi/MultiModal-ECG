@@ -12,12 +12,12 @@ import pywt
 from scipy.ndimage import zoom
 from tqdm import tqdm
 from numpy.lib.format import open_memmap
+from configs import PROCESSED_PATH, WAVELETS_PATH
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
-PROCESSED_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/'
-WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/'
+
 SAMPLING_RATE = 100
 IMAGE_SIZE = 224
 BATCH_SIZE = 100  # Process this many samples at a time to manage memory
