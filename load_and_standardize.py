@@ -12,13 +12,12 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, MultiLabelBinarizer
 from tqdm import tqdm
 import wfdb
-
+from configs import PROCESSED_PATH, DATA_PATH
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
-DATA_PATH = '../datasets/ECG/'
-PROCESSED_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/'
+
 SAMPLING_RATE = 100
 
 os.makedirs(PROCESSED_PATH, exist_ok=True)
