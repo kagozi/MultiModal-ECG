@@ -24,7 +24,7 @@ from models import (CWT2DCNN, DualStreamCNN, ViTFusionECG,
                     ,HybridSwinTransformerEarlyFusion, HybridSwinTransformerLateFusion, EfficientNetFusionECG, EfficientNetEarlyFusion, EfficientNetLateFusion,
                     EfficientNetFusionECG, ResNet50EarlyFusion, 
                     ResNet50LateFusion,
-                    ResNet50ECG
+                    ResNet50ECG, EfficientNetECG
                     )
 from focal_loss import FocalLoss, DistributionAwareFocalLoss
 from configs import configs, PROCESSED_PATH, WAVELETS_PATH, RESULTS_PATH
@@ -293,6 +293,8 @@ def train_model(config, metadata, device):
      # EfficientNet variants
     elif config['model'] == 'EfficientNetFusionECG':
         model = EfficientNetFusionECG(num_classes=num_classes, pretrained=True, adapter_strategy=adapter_strategy)
+    elif config['model'] == 'EfficientNetECG':
+        model = EfficientNetECG(num_classes=num_classes, pretrained=True, adapter_strategy=adapter_strategy)
     elif config['model'] == 'EfficientNetEarlyFusion':
         model = EfficientNetEarlyFusion(num_classes=num_classes, pretrained=True)
     elif config['model'] == 'EfficientNetLateFusion':
