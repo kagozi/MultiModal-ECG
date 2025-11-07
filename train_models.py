@@ -336,6 +336,9 @@ def train_model(config, metadata, device):
         class_counts = y_train.sum(axis=0)
         total_samples = len(y_train)
         class_weights = torch.FloatTensor(total_samples / (len(metadata['classes']) * class_counts))
+        class_weights1 = [0.25, 0.75, 0.5, 0.15, 0.5]
+        class_weights2 = [1, 5, 2.5, 1, 2.5]
+        class_weights3 = [0.25, 0.75, 0.75, 0.25, 0.75]
         
         criterion = DistributionAwareFocalLoss(
             class_weights=class_weights,
