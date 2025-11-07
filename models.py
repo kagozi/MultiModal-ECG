@@ -341,23 +341,23 @@ class SwinTransformerLateFusion(nn.Module):
         
         return output
     
-
+    
 class EfficientNetFusionECG(nn.Module):
     """
-    EfficientNet for ECG - lighter and faster than transformers.
-    Good for comparison and faster training.
+    EfficientNet with early fusion for scalogram + phasogram.
+    Concatenates 12-channel scalogram + 12-channel phasogram = 24 channels
+    Then adapts to 3 channels for pretrained backbone.
     """
     
-    def __init__(self, num_classes=5, dropout=0.3, pretrained=True,
-                 model_name='efficientnet_b2', adapter_strategy='learned'):
+    def __init__(self, num_classes=5, dropout=0.3, pretrained=True):
         super().__init__()
         
-        # Channel adapter: 12 → 3
-        self.adapter = ChannelAdapter(strategy=adapter_strategy)
+        # Adapter for 24 channels (12 scalo + 12 phaso) → 3 channels
+        self.adapter = nn.Conv2d(24, 3, kernel_size=1, bias=False)
         
-        # Load pretrained EfficientNet
+        # Load pretrained ResNet50
         self.backbone = timm.create_model(
-            model_name,
+            'efficientnet_b2',
             pretrained=pretrained,
             num_classes=0,
             in_chans=3
@@ -365,7 +365,7 @@ class EfficientNetFusionECG(nn.Module):
         
         num_features = self.backbone.num_features
         
-        # Custom classification head
+        # Classification head
         self.classifier = nn.Sequential(
             nn.Dropout(dropout),
             nn.Linear(num_features, 512),
@@ -376,11 +376,11 @@ class EfficientNetFusionECG(nn.Module):
         )
         
         n_params = sum(p.numel() for p in self.parameters())
-        print(f"  EfficientNetFusionECG: {n_params/1e6:.1f}M parameters (adapter={adapter_strategy})")
+        print(f"  EfficientNetFusionECG: {n_params/1e6:.1f}M parameters")
     
     def forward(self, x):
-        # x: (B, 12, H, W) → (B, 3, H, W)
-        x = self.adapter(x)
+        # x: (B, 24, H, W) from fusion dataset mode
+        x = self.adapter(x)  # (B, 3, H, W)
         features = self.backbone(x)
         output = self.classifier(features)
         return output

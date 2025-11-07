@@ -308,8 +308,6 @@ def train_model(config, metadata, device):
         model = ResNet50LateFusion(num_classes=num_classes, pretrained=True, adapter_strategy=adapter_strategy)
     elif config['model'] == 'ResNet50ECG':
         model = ResNet50ECG(num_classes=num_classes, pretrained=True, adapter_strategy=adapter_strategy)
-    elif config['model'] == 'ResNet50EarlyFusion':
-        model = ResNet50EarlyFusion(num_classes=num_classes, pretrained=True)
     elif config['model'] == 'ResNet50LateFusion':
         model = ResNet50LateFusion(num_classes=num_classes, pretrained=True, adapter_strategy=adapter_strategy)
     
