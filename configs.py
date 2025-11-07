@@ -51,9 +51,9 @@ configs = [
 
 
         # EfficientNet Early Fusion variants
-        {'mode': 'both', 'model': 'EfficientNetFusionECG', 'name': 'EfficientNet-ECG-Focal', 'loss': 'focal'},
-        {'mode': 'both', 'model': 'EfficientNetFusionECG', 'name': 'EfficientNet-ECG-BCE', 'loss': 'bce'},
-        {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'EfficientNetLateFusion-Focal-Weighted', 'loss': 'focal_weighted'},
+        {'mode': 'fusion', 'model': 'EfficientNetEarlyFusion', 'name': 'EfficientNetEarlyFusion-Focal', 'loss': 'focal'},
+        {'mode': 'fusion', 'model': 'EfficientNetEarlyFusion', 'name': 'EfficientNetEarlyFusion-BCE', 'loss': 'bce'},
+        {'mode': 'fusion', 'model': 'EfficientNetEarlyFusion', 'name': 'EfficientNetEarlyFusion-Focal-Weighted', 'loss': 'focal_weighted'},
         
         ## EfficientNet Late Fusion variants
         {'mode': 'both', 'model': 'EfficientNetLateFusion', 'name': 'LateFusion-EfficientNet-Focal', 'loss': 'focal'},
