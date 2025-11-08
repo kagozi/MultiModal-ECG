@@ -53,7 +53,7 @@ class CWTDataset(Dataset):
     Uses memory mapping to avoid loading entire dataset into RAM
     """
     
-    def __init__(self, scalo_path, phaso_path, labels, mode='scalogram'):
+    def __init__(self, scalo_path, phaso_path, labels, mode='scalogram', augment=False):
         """
         Args:
             scalo_path: Path to scalogram .npy file
@@ -65,7 +65,7 @@ class CWTDataset(Dataset):
         self.phasograms = np.load(phaso_path, mmap_mode='r')
         self.labels = torch.FloatTensor(labels)
         self.mode = mode
-        
+        self.augment = augment
         print(f"  Dataset loaded: {len(self.labels)} samples, mode={mode}")
         print(f"  Scalograms shape: {self.scalograms.shape}")
         print(f"  Phasograms shape: {self.phasograms.shape}")
@@ -93,6 +93,10 @@ class CWTDataset(Dataset):
         scalo = torch.FloatTensor(np.array(self.scalograms[idx], copy=True))
         phaso = torch.FloatTensor(np.array(self.phasograms[idx], copy=True))
         label = self.labels[idx]
+        
+        if self.augment:
+            scalo = self._augment_image(scalo)
+            phaso = self._augment_image(phaso)
         
         if self.mode == 'scalogram':
             return scalo, label
