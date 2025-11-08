@@ -73,6 +73,20 @@ class CWTDataset(Dataset):
     def __len__(self):
         return len(self.labels)
     
+    def _augment_image(self, img):
+        """Light augmentation for CWT images"""
+        if torch.rand(1).item() > 0.5:
+            img = torch.flip(img, dims=[2])  # Horizontal flip
+        
+        if torch.rand(1).item() > 0.7:
+            img = torch.flip(img, dims=[1])  # Vertical flip
+        
+        if torch.rand(1).item() > 0.5:
+            brightness = 1.0 + (torch.rand(1).item() - 0.5) * 0.2
+            img = torch.clamp(img * brightness, 0, 1)
+        
+        return img
+    
     def __getitem__(self, idx):
         # Load data on-the-fly from memory-mapped files
         # Copy arrays to make them writable before converting to tensor
