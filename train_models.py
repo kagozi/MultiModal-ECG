@@ -322,10 +322,10 @@ def train_model(config, metadata, device):
     if loss_type == 'focal':
         # Option 1: Standard Focal Loss (simple, works well)
         criterion = FocalLoss(
-            gamma=2.0, 
-            alpha=0.25, 
-            task_type='multi-label',
-            reduction='mean'
+            # gamma=2.0, 
+            # alpha=0.25, 
+            # task_type='multi-label',
+            # reduction='mean'
         )
         print(f"Using Focal Loss (gamma={2.0}, alpha={0.25})")
         
@@ -359,10 +359,10 @@ def train_model(config, metadata, device):
         gamma_per_class = 2.0 + (1.0 - class_counts / class_counts.max())
         
         criterion = FocalLoss(
-            gamma=2.5,  # Higher default gamma
-            alpha=0.25,
-            task_type='multi-label',
-            reduction='mean'
+            # gamma=2.5,  # Higher default gamma
+            # alpha=0.25,
+            # task_type='multi-label',
+            # reduction='mean'
         )
         print(f"Using Adaptive Focal Loss (gamma={2.5})")
         
