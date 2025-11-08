@@ -254,17 +254,17 @@ def train_model(config, metadata, device):
     train_dataset = CWTDataset(
         os.path.join(WAVELETS_PATH, 'train_scalograms.npy'),
         os.path.join(WAVELETS_PATH, 'train_phasograms.npy'),
-        y_train, mode=mode
+        y_train, mode=mode, augment=True
     )
     val_dataset = CWTDataset(
         os.path.join(WAVELETS_PATH, 'val_scalograms.npy'),
         os.path.join(WAVELETS_PATH, 'val_phasograms.npy'),
-        y_val, mode=mode
+        y_val, mode=mode, augment=False
     )
     test_dataset = CWTDataset(
         os.path.join(WAVELETS_PATH, 'test_scalograms.npy'),
         os.path.join(WAVELETS_PATH, 'test_phasograms.npy'),
-        y_test, mode=mode
+        y_test, mode=mode, augment=False
     )
     
     # Create dataloaders
