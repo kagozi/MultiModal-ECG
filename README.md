@@ -19,7 +19,7 @@ This repository implements the **multi-representation ECG classification framewo
 - **Ensemble AUC: 0.9238** (beats XResNet1d101: 0.9224)
 - **Hybrid Swin** is the best single backbone (0.9023, early fusion)
 
-### TABLE III. Performance of Top Models and Ensemble on the PTB-XL Superdiagnostic Task
+### Performance of Top Models and Ensemble on the PTB-XL Superdiagnostic Task
 
 | Domain        | Model           | Loss Function | AUC     | F1     |
 |---------------|-----------------|---------------|---------|--------|
