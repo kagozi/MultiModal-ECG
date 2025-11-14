@@ -4,7 +4,7 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](https://python.org)  
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0-orange)](https://pytorch.org)
 
-> **SOTA ensemble AUC 0.9233** on **PTB-XL Super-Diagnostic Task** using **early fusion of scalograms + phasograms + raw signals**.
+> **SOTA ensemble AUC 0.9238** on **PTB-XL Super-Diagnostic Task** using **early fusion of scalograms + phasograms + raw signals**.
 
 This repository implements the **multi-representation ECG classification framework** from combining:
 - **Time-domain**: XResNet1d101 (raw ECG)
@@ -16,8 +16,18 @@ This repository implements the **multi-representation ECG classification framewo
 ---
 
 ## Highlights
-- **Ensemble AUC: 0.9233** (beats XResNet1d101: 0.9224)
-- **Hybrid Swin** best single backbone (0.9018 early fusion)
+- **Ensemble AUC: 0.9238** (beats XResNet1d101: 0.9224)
+- **Hybrid Swin** is the best single backbone (0.9023, early fusion)
+
+### TABLE III. Performance of Top Models and Ensemble on the PTB-XL Superdiagnostic Task
+
+| Domain        | Model           | Loss Function | AUC     | F1     |
+|---------------|-----------------|---------------|---------|--------|
+| Raw Signals   | XResNet1d101    | BCE           | 0.9224  | 0.7265 |
+| Early Fusion  | Hybrid Swin     | Focal (W1)    | 0.9023  | 0.6970 |
+| Early Fusion  | ResNet50        | Focal (W1)    | 0.8915  | 0.6850 |
+| —             | **Ensemble**    | —             | **0.9238** | **0.7402** |
+
 - **Early > Late > Single modality**
 - Full preprocessing, training, and evaluation pipeline
 - Reproducible on **PTB-XL** with patient-wise splits 
