@@ -1,29 +1,53 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "30px",
+    "fontFamily": "trebuchet ms, verdana, arial, sans-serif",
+    "lineColor": "#333333"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "nodeSpacing": 90,
+    "rankSpacing": 110,
+    "curve": "basis",
+    "useMaxWidth": true
+  },
+  "securityLevel": "loose"
+}}%%
 flowchart LR
-    %% --- Input Images ---
-    R["<img src='https://raw.githubusercontent.com/kagozi/ECG-Greedy/main/rawsignal.png' width='70px' ><br>Raw ECGs<br>(12 × 1000)"]
-    SCL["<img src='https://raw.githubusercontent.com/kagozi/ECG-Greedy/main/scalogram.png' width='70px' ><br>Scalograms<br>(224 × 224 × 12)"]
-    PHS["<img src='https://raw.githubusercontent.com/kagozi/ECG-Greedy/main/phasogram.png' width='70px' ><br>Phasograms<br>(224 × 224 × 12)"]
+    %% --- Raw input ---
+    R["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/rawsignal.png' width='80px' ><br><b>Raw ECGs</b><br>(12 × 1000)"]
 
-    %% --- Transform Arrows (optional, dotted for generation) ---
-    R -.->|CWT| SCL
-    R -.->|Phase| PHS
-    
-    %% --- Pretrained Pipeline ---
-    SCL --> A1["Adapter 1×1 Conv 12 → 3 ch"]
-    PHS --> A2["Adapter 1×1 Conv 12 → 3 ch"]
+    %% --- CWT ---
+    CWT["<b>CWT</b><br>(Morlet wavelet)"]
 
-    A1 --> E1["Pretrained Backbone→ fₛ ∈ ℝ^(B×d)"]
-    A2 --> E2["Pretrained Backbone→ fₚ ∈ ℝ^(B×d)"]
+    %% --- Scalogram & Phasogram ---
+    SCL["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/scalogram.png' width='80px' ><br><b>Scalograms</b><br>(224 × 224 × 12)"]
+    PHS["<img src='https://raw.githubusercontent.com/kagozi/MultiModal-ECG/main/extra-resources/phasogram.png' width='80px' ><br><b>Phasograms</b><br>(224 × 224 × 12)"]
 
-    E1 --> C["Concat [fₛ; fₚ] ∈ ℝ^(B×2d)"]
+    %% --- Flow: CWT generates both ---
+    R --> CWT
+    CWT --> SCL
+    CWT --> PHS
+
+    %% --- Dual Adapters ---
+    SCL --> A1["<b>Adapter</b><br>1×1 Conv<br>12 → 3 ch"]
+    PHS --> A2["<b>Adapter</b><br>1×1 Conv<br>12 → 3 ch"]
+
+    %% --- Dual Pretrained Backbones ---
+    A1 --> E1["<b>Pretrained Backbone</b><br>→ fₛ ∈ R^(B×d)"]
+    A2 --> E2["<b>Pretrained Backbone</b><br>→ fₚ ∈ R^(B×d)"]
+
+    %% --- Concat Block ---
+    E1 --> C["<b>Concat</b><br>[fₛ; fₚ] ∈ R^(B×2d)"]
     E2 --> C
 
-    %% --- Condensed Fusion + Classifier ---
-    C --> FUS["Fusion MLP 2d → 1024 ReLU → BN → Drop"]
-    FUS --> CLS["Classifier 1024 → 512 → 5 ReLU → BN → Drop"]
+    %% --- Fusion + Classifier ---
+    C --> FUS["<b>Fusion FC</b><br>2d → 1024<br>ReLU → BN → Drop(0.3)"]
+    FUS --> CLS["<b>Classifier</b><br>1024 → 512 → 5<br>ReLU → BN → Drop(0.3)"]
 
-    %% --- 5-Neuron Output ---
-    subgraph Output_Layer ["Final Multilabel Classifier"]
+    %% --- Output ---
+    subgraph Output ["<b>Final Multilabel Classifier</b>"]
         direction TB
         CLS --> O1(( ))
         CLS --> O2(( ))
@@ -32,17 +56,16 @@ flowchart LR
         CLS --> O5(( ))
     end
 
-    Output_Layer --> SIG["Sigmoid Focal Loss (γ=2, α=0.25)"]
 
     %% --- Styling ---
-    classDef img fill:#ffffff,stroke:#cccccc,stroke-width:1px
-    classDef mod fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
-    classDef join fill:#ede7f6,stroke:#5e35b1,stroke-width:1px
-    classDef head fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
-    classDef neuron fill:#c8e6c9,stroke:#2e7d32,stroke-width:1px
+    classDef img    fill:#ffffff,stroke:#cccccc,stroke-width:2.5px,color:#000000
+    classDef mod    fill:#e3f2fd,stroke:#1565c0,stroke-width:2.5px,color:#000000
+    classDef join   fill:#ede7f6,stroke:#5e35b1,stroke-width:2.5px,color:#000000
+    classDef head   fill:#e8f5e9,stroke:#2e7d32,stroke-width:2.5px,color:#000000
+    classDef neuron fill:#c8e6c9,stroke:#2e7d32,stroke-width:2.5px,color:#000000
 
-    class R,SCL,PHS img
-    class A1,A2,E1,E2 mod
+    class R,SCL,PHS,CWT img
+    class A1,A2,E1,E2,FUS,CLS mod
     class C join
-    class FUS,CLS,SIG head
+    class SIG head
     class O1,O2,O3,O4,O5 neuron
