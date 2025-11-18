@@ -12,7 +12,6 @@ This repository implements the **multi-representation ECG classification framewo
 - **Phase-domain**: CWT → **Phasograms**
 - **Fusion**: Early & Late
 - **Backbones**: Custom 2DCNN, ResNet50, EfficientNet-B0, Swin, **Hybrid Swin**
-
 ---
 
 ## Highlights
@@ -88,7 +87,3 @@ python3 benchmark.py # Trains XResNet1d101 on raw signals
 python3 train_models.py # Trains CWT based models on Phasogram and Scalograms
 python3 tests_ensemble.py # Run tests, generate confusion matrices, and evaluate different ensembling strategies
 ```
-
-
-
-
