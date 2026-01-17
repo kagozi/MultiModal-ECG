@@ -1,0 +1,39 @@
+name: ecg
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+
+  # Core scientific stack (conda)
+  - numpy=1.26.4
+  - pandas=2.2.2
+  - scipy=1.13.1
+  - matplotlib=3.9.2
+  - seaborn=0.13.2
+  - scikit-learn=1.5.1
+  - pywavelets=1.6.0
+  - tqdm=4.66.4
+
+  # Data / ECG
+  - wfdb=4.1.2
+
+  # Computer vision
+  - opencv=4.11.0
+
+  # PyTorch
+  - pytorch=2.4.0
+  - torchvision=0.19.0
+
+  # Choose ONE of the following CUDA options:
+  # If you have an NVIDIA GPU and want CUDA 12.1:
+  - pytorch-cuda=12.1
+
+  # If you are CPU-only, comment out pytorch-cuda above and use:
+  # - cpuonly
+
+  # Pip-only packages
+  - pip:
+      - timm==1.0.20
