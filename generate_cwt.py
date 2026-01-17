@@ -10,10 +10,11 @@ import os
 import pickle
 import numpy as np
 import pywt
+import time
 from scipy.ndimage import zoom
 from tqdm import tqdm
 from numpy.lib.format import open_memmap
-from configs import PROCESSED_PATH, WAVELETS_PATH
+from configs import GENERATE_ALL_CWT, PROCESSED_PATH, WAVELETS_PATH, RESULTS_PATH
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
@@ -159,6 +160,7 @@ class CWTGenerator:
 # MAIN EXECUTION
 # ============================================================================
 
+
 def main():
     # Load metadata
     print("\n[1/4] Loading metadata...")
@@ -172,66 +174,87 @@ def main():
     print(f"  Test:  {metadata['test_size']} samples")
     print(f"  Signal shape: {metadata['signal_shape']}")
     
-    # Initialize CWT generator
-    print("\n[2/4] Initializing CWT generator...")
+    # # Initialize CWT generator
+    # print("\n[2/4] Initializing CWT generator...")
     cwt_gen = CWTGenerator(
         sampling_rate=SAMPLING_RATE,
         image_size=IMAGE_SIZE,
         wavelet='cmor2.0-1.0'
     )
     
-    # Process training set
-    print("\n[3/4] Processing TRAINING set...")
-    X_train = np.load(os.path.join(PROCESSED_PATH, 'train_standardized.npy'), mmap_mode='r')
-    
-    cwt_gen.process_dataset_batched(
-        X_train,
-        output_scalo_path=os.path.join(WAVELETS_PATH, 'train_scalograms.npy'),
-        output_phaso_path=os.path.join(WAVELETS_PATH, 'train_phasograms.npy'),
-        batch_size=BATCH_SIZE
-    )
-    
-    del X_train  # Free memory
-    
-    # Process validation set
-    print("\n[3/4] Processing VALIDATION set...")
-    X_val = np.load(os.path.join(PROCESSED_PATH, 'val_standardized.npy'), mmap_mode='r')
-    
-    cwt_gen.process_dataset_batched(
-        X_val,
-        output_scalo_path=os.path.join(WAVELETS_PATH, 'val_scalograms.npy'),
-        output_phaso_path=os.path.join(WAVELETS_PATH, 'val_phasograms.npy'),
-        batch_size=BATCH_SIZE
-    )
-    
-    del X_val
-    
-    # Process test set
-    print("\n[4/4] Processing TEST set...")
-    X_test = np.load(os.path.join(PROCESSED_PATH, 'test_standardized.npy'), mmap_mode='r')
-    
-    cwt_gen.process_dataset_batched(
-        X_test,
-        output_scalo_path=os.path.join(WAVELETS_PATH, 'test_scalograms.npy'),
-        output_phaso_path=os.path.join(WAVELETS_PATH, 'test_phasograms.npy'),
-        batch_size=BATCH_SIZE
-    )
-    
-    del X_test
-    
-    print("\n" + "="*80)
-    print("STEP 2 COMPLETE!")
-    print("="*80)
-    print(f"\nAll CWT representations saved to: {WAVELETS_PATH}")
-    print("\nFiles created:")
-    print("  - train_scalograms.npy")
-    print("  - train_phasograms.npy")
-    print("  - val_scalograms.npy")
-    print("  - val_phasograms.npy")
-    print("  - test_scalograms.npy")
-    print("  - test_phasograms.npy")
-    print("\nNext step: Run 3_train_models.py to train CNN models")
+    if GENERATE_ALL_CWT:
+        # Process training set
+        print("\n[3/4] Processing TRAINING set...")
+        X_train = np.load(os.path.join(PROCESSED_PATH, 'train_standardized.npy'), mmap_mode='r')
+        
+        cwt_gen.process_dataset_batched(
+            X_train,
+            output_scalo_path=os.path.join(WAVELETS_PATH, 'train_scalograms.npy'),
+            output_phaso_path=os.path.join(WAVELETS_PATH, 'train_phasograms.npy'),
+            batch_size=BATCH_SIZE
+        )
+        
+        del X_train  # Free memory
+        
+        # Process validation set
+        print("\n[3/4] Processing VALIDATION set...")
+        X_val = np.load(os.path.join(PROCESSED_PATH, 'val_standardized.npy'), mmap_mode='r')
+        
+        cwt_gen.process_dataset_batched(
+            X_val,
+            output_scalo_path=os.path.join(WAVELETS_PATH, 'val_scalograms.npy'),
+            output_phaso_path=os.path.join(WAVELETS_PATH, 'val_phasograms.npy'),
+            batch_size=BATCH_SIZE
+        )
+        
+        del X_val
+        
+        # Process test set
+        print("\n[4/4] Processing TEST set...")
+        X_test = np.load(os.path.join(PROCESSED_PATH, 'test_standardized.npy'), mmap_mode='r')
+        
+        cwt_gen.process_dataset_batched(
+            X_test,
+            output_scalo_path=os.path.join(WAVELETS_PATH, 'test_scalograms.npy'),
+            output_phaso_path=os.path.join(WAVELETS_PATH, 'test_phasograms.npy'),
+            batch_size=BATCH_SIZE
+        )
+        
+        del X_test
+        
+        print("\n" + "="*80)
+        print("STEP 2 COMPLETE!")
+        print("="*80)
+        print(f"\nAll CWT representations saved to: {WAVELETS_PATH}")
+        print("\nFiles created:")
+        print("  - train_scalograms.npy")
+        print("  - train_phasograms.npy")
+        print("  - val_scalograms.npy")
+        print("  - val_phasograms.npy")
+        print("  - test_scalograms.npy")
+        print("  - test_phasograms.npy")
+        print("\nNext step: Run 3_train_models.py to train CNN models")
 
+    # --- quick sanity benchmark (single sample) ---
+    X_tmp = np.load(os.path.join(PROCESSED_PATH, 'test_standardized.npy'), mmap_mode='r')
+    ecg = np.array(X_tmp[0], copy=True)
 
+    t0 = time.perf_counter()
+    scalo, _ = cwt_gen.process_12_lead_ecg(ecg)
+    t1 = time.perf_counter()
+
+    t2 = time.perf_counter()
+    _, phaso = cwt_gen.process_12_lead_ecg(ecg)
+    t3 = time.perf_counter()
+
+    print(f"[Timing] 1 sample (12-lead) -> scalogram: {(t1-t0):.4f}s")
+    print(f"[Timing] 1 sample (12-lead) -> phasogram: {(t3-t2):.4f}s")
+    del X_tmp
+    
+    # write the results to RESULTS_PATH
+    results_file = os.path.join(RESULTS_PATH, 'cwt_timing_results.txt')
+    with open(results_file, 'w') as f:
+        f.write(f"1 sample (12-lead) -> scalogram: {(t1-t0):.4f}s\n")
+        f.write(f"1 sample (12-lead) -> phasogram: {(t3-t2):.4f}s\n")
 if __name__ == '__main__':
     main()

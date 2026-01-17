@@ -2,6 +2,8 @@ PROCESSED_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/'
 WAVELETS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/'
 RESULTS_PATH = '../santosh_lab/shared/KagoziA/wavelets/cwt/processed_wavelets/results/'
 DATA_PATH = '../datasets/ECG/'
+BASELINE_RESULTS_PATH = '../santosh_lab/shared/KagoziA/wavelets/xresnet_baseline/results/'
+GENERATE_ALL_CWT = False  # Whether to generate all CWT representations or only a subset
 
 #Define model configurations to train
 configs = [
