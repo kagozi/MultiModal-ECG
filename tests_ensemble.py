@@ -412,6 +412,94 @@ def get_predictions(model, dataloader, config):
     
     return np.vstack(all_preds), np.vstack(all_labels)
 
+def _sync_cuda():
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+
+@torch.no_grad()
+def time_inference(model, dataloader, config, n_warmup_batches=2):
+    """
+    Measures forward-pass inference time over the entire dataloader.
+    Uses CUDA synchronization for accurate GPU timing.
+    Returns timing stats.
+    """
+    model.eval()
+
+    # Warmup (stabilizes CUDA kernels, caching, etc.)
+    it = iter(dataloader)
+    for _ in range(n_warmup_batches):
+        try:
+            batch = next(it)
+        except StopIteration:
+            break
+
+        if isinstance(batch[0], (tuple, list)):
+            (x1, x2), _y = batch
+            x1 = x1.to(DEVICE, non_blocking=True)
+            x2 = x2.to(DEVICE, non_blocking=True)
+
+            is_dual = (config.get("model") == "DualStream") or (config.get("mode") == "both")
+            if is_dual:
+                _ = model(x1, x2)
+            else:
+                mode = config.get("mode")
+                if mode == "scalogram":
+                    _ = model(x1)
+                elif mode == "phasogram":
+                    _ = model(x2)
+                elif mode == "fusion":
+                    _ = model(torch.cat([x1, x2], dim=1))
+                else:
+                    _ = model(x1)
+        else:
+            x, _y = batch
+            x = x.to(DEVICE, non_blocking=True)
+            _ = model(x)
+
+    _sync_cuda()
+
+    # Timed run (forward only, but uses your same batching)
+    n_samples = len(dataloader.dataset)
+    t0 = time.perf_counter()
+
+    for batch in dataloader:
+        if isinstance(batch[0], (tuple, list)):
+            (x1, x2), _y = batch
+            x1 = x1.to(DEVICE, non_blocking=True)
+            x2 = x2.to(DEVICE, non_blocking=True)
+
+            is_dual = (config.get("model") == "DualStream") or (config.get("mode") == "both")
+            if is_dual:
+                _ = model(x1, x2)
+            else:
+                mode = config.get("mode")
+                if mode == "scalogram":
+                    _ = model(x1)
+                elif mode == "phasogram":
+                    _ = model(x2)
+                elif mode == "fusion":
+                    _ = model(torch.cat([x1, x2], dim=1))
+                else:
+                    _ = model(x1)
+        else:
+            x, _y = batch
+            x = x.to(DEVICE, non_blocking=True)
+            _ = model(x)
+
+    _sync_cuda()
+    total_s = time.perf_counter() - t0
+
+    return {
+        "total_s": float(total_s),
+        "n_samples": int(n_samples),
+        "ms_per_sample": float((total_s / max(n_samples, 1)) * 1000.0),
+        "samples_per_s": float(n_samples / max(total_s, 1e-12)),
+        "batch_size": int(getattr(dataloader, "batch_size", -1)),
+        "num_workers": int(getattr(dataloader, "num_workers", -1)),
+        "device": str(DEVICE)
+    }
+
+
 def apply_thresholds(y_scores, thresholds):
     y_pred = (y_scores > thresholds).astype(int)
     for i, pred in enumerate(y_pred):
