@@ -276,6 +276,21 @@ class ECGDataset(Dataset):
 # STEP 6: TRAINING FUNCTIONS
 # ============================================================================
 
+def fmt_seconds(seconds: float) -> str:
+    return str(timedelta(seconds=int(seconds)))
+
+def _sync_cuda():
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+
+def get_gpu_info():
+    if not torch.cuda.is_available():
+        return {"device": "cpu", "gpu_name": None}
+    return {
+        "device": "cuda",
+        "gpu_name": torch.cuda.get_device_name(0),
+    }
+
 def train_epoch(model, dataloader, criterion, optimizer, device):
     """Train for one epoch"""
     model.train()
